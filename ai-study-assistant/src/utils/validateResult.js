@@ -1,37 +1,90 @@
+const DIFFICULTIES = ["easy", "medium", "hard"];
+
+function hasText(value) {
+  return typeof value === "string" && value.trim().length > 0;
+}
+
+function isFlashcardData(data) {
+  return (
+    Boolean(data) &&
+    hasText(data.question) &&
+    hasText(data.answer) &&
+    DIFFICULTIES.includes(data.difficulty)
+  );
+}
+
+function isQuizData(data) {
+  return (
+    Boolean(data) &&
+    hasText(data.question) &&
+    Array.isArray(data.options) &&
+    data.options.length === 4 &&
+    data.options.every(hasText) &&
+    Number.isInteger(data.correctAnswer) &&
+    data.correctAnswer >= 0 &&
+    data.correctAnswer < data.options.length
+  );
+}
+
+function isChecklistData(data) {
+  return (
+    Boolean(data) &&
+    hasText(data.title) &&
+    Array.isArray(data.items) &&
+    data.items.length > 0 &&
+    data.items.every(hasText)
+  );
+}
+
+function isChartData(data) {
+  return (
+    Boolean(data) &&
+    hasText(data.title) &&
+    hasText(data.description) &&
+    Array.isArray(data.labels) &&
+    Array.isArray(data.values) &&
+    data.labels.length > 0 &&
+    data.labels.length === data.values.length &&
+    data.labels.every(hasText) &&
+    data.values.every((value) => Number.isFinite(value))
+  );
+}
+
+export function isValidBlock(block) {
+  if (!block || typeof block !== "object" || !hasText(block.id)) {
+    return false;
+  }
+
+  switch (block.type) {
+    case "flashcard":
+      return isFlashcardData(block.data);
+
+    case "quiz":
+      return isQuizData(block.data);
+
+    case "checklist":
+      return isChecklistData(block.data);
+
+    case "chart":
+      return isChartData(block.data);
+
+    default:
+      return false;
+  }
+}
+
 export function validateStudyKit(data) {
   if (!data || typeof data !== "object") {
     return false;
   }
 
-  if (!Array.isArray(data.cards) || data.cards.length === 0) {
+  if (!hasText(data.title)) {
     return false;
   }
 
-  if (!Array.isArray(data.quiz) || data.quiz.length === 0) {
+  if (!Array.isArray(data.blocks) || data.blocks.length === 0) {
     return false;
   }
 
-  const validCards = data.cards.every(
-    (card) =>
-      card &&
-      typeof card.id === "string" &&
-      typeof card.question === "string" &&
-      typeof card.answer === "string" &&
-      ["easy", "medium", "hard"].includes(card.difficulty)
-  );
-
-  const validQuiz = data.quiz.every(
-    (question) =>
-      question &&
-      typeof question.id === "string" &&
-      typeof question.question === "string" &&
-      Array.isArray(question.options) &&
-      question.options.length === 4 &&
-      question.options.every((option) => typeof option === "string") &&
-      Number.isInteger(question.correctAnswer) &&
-      question.correctAnswer >= 0 &&
-      question.correctAnswer < question.options.length
-  );
-
-  return validCards && validQuiz;
+  return data.blocks.every(isValidBlock);
 }

@@ -1,16 +1,14 @@
 function ErrorState({ message, onRetry }) {
   return (
-    <section className="state-card error-state">
+    <section className="state-card error-state" role="alert">
       <div className="error-icon">!</div>
 
-      <h3>We couldn't generate your study kit</h3>
+      <h3>We couldn&apos;t generate your study kit</h3>
 
-      <p>
-        {message || "Something went wrong. Please try again."}
-      </p>
+      <p>{message || "Something went wrong. Please try again."}</p>
 
       {onRetry && (
-        <button onClick={onRetry}>
+        <button type="button" onClick={onRetry}>
           Try Again
         </button>
       )}

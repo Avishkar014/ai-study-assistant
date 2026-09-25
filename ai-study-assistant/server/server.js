@@ -1,11 +1,22 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import { fileURLToPath } from "node:url";
 import { GoogleGenAI } from "@google/genai";
-import { studyKitSchema } from "../validation/studyKitSchema.js";
+import {
+  MODEL,
+  buildGenerationPrompt,
+  buildRefinementPrompt,
+  countBlocks,
+  describeAiError,
+  parseRefinementRequest,
+  parseStudyInput,
+  parseStudyKit,
+  requestStudyKit,
+} from "./studyKit.js";
 
 dotenv.config({
-  path: "../.env",
+  path: fileURLToPath(new URL("../.env", import.meta.url)),
 });
 
 const app = express();
@@ -23,6 +34,10 @@ const ai = new GoogleGenAI({
 app.use(cors());
 app.use(express.json());
 
+function writeEvent(res, payload) {
+  res.write(`data: ${JSON.stringify(payload)}\n\n`);
+}
+
 app.get("/api/health", (req, res) => {
   res.json({
     success: true,
@@ -31,114 +46,140 @@ app.get("/api/health", (req, res) => {
 });
 
 app.post("/api/generate", async (req, res) => {
+  const parsedInput = parseStudyInput(req.body?.input);
+
+  if (parsedInput.error) {
+    return res.status(400).json({
+      error: parsedInput.error,
+    });
+  }
+
+  const result = await requestStudyKit(
+    ai,
+    buildGenerationPrompt(parsedInput.value),
+    "Failed to generate study kit."
+  );
+
+  if (result.error) {
+    return res.status(result.status).json({
+      error: result.error,
+    });
+  }
+
+  return res.json({
+    success: true,
+    data: result.data,
+  });
+});
+
+app.post("/api/generate/stream", async (req, res) => {
+  const parsedInput = parseStudyInput(req.body?.input);
+
+  if (parsedInput.error) {
+    return res.status(400).json({
+      error: parsedInput.error,
+    });
+  }
+
+  res.setHeader("Content-Type", "text/event-stream");
+  res.setHeader("Cache-Control", "no-cache");
+  res.setHeader("Connection", "keep-alive");
+  res.flushHeaders();
+
   try {
-    const { input } = req.body;
-
-    if (!input || typeof input !== "string" || !input.trim()) {
-      return res.status(400).json({
-        error: "Study topic or notes are required.",
-      });
-    }
-
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: `Create a study kit from the following content:
-
-${input}
-
-Return ONLY valid JSON. Do not include markdown, code fences, or explanatory text.
-
-The JSON must have exactly this structure:
-
-{
-  "cards": [
-    {
-      "id": "string",
-      "question": "string",
-      "answer": "string",
-      "difficulty": "easy | medium | hard"
-    }
-  ],
-  "quiz": [
-    {
-      "id": "string",
-      "question": "string",
-      "options": ["string", "string", "string", "string"],
-      "correctAnswer": 0
-    }
-  ]
-}
-
-Generate exactly 5 flashcards and exactly 5 quiz questions.
-
-For quiz questions, correctAnswer must be the zero-based index of the correct option.`,
+    const stream = await ai.models.generateContentStream({
+      model: MODEL,
+      contents: buildGenerationPrompt(parsedInput.value),
       config: {
         responseMimeType: "application/json",
       },
     });
 
-    if (!response.text) {
-      return res.status(502).json({
-        error: "The AI returned an empty response.",
-      });
+    let text = "";
+    let streamedBlocks = 0;
+    let streamedCharacters = 0;
+
+    for await (const chunk of stream) {
+      if (res.writableEnded) {
+        return;
+      }
+
+      if (chunk.text) {
+        text += chunk.text;
+      }
+
+      const blocks = countBlocks(text);
+
+      if (
+        blocks !== streamedBlocks ||
+        text.length - streamedCharacters >= 200
+      ) {
+        streamedBlocks = blocks;
+        streamedCharacters = text.length;
+
+        writeEvent(res, {
+          type: "progress",
+          blocks,
+          characters: text.length,
+        });
+      }
     }
 
-    let parsedData;
-
-    try {
-      parsedData = JSON.parse(response.text);
-    } catch {
-      return res.status(502).json({
-        error: "The AI returned invalid JSON.",
-      });
+    if (res.writableEnded) {
+      return;
     }
 
-    const validationResult = studyKitSchema.safeParse(parsedData);
+    const result = parseStudyKit(text);
 
-    if (!validationResult.success) {
-      console.error(
-        "Study kit validation failed:",
-        validationResult.error.issues
-      );
-
-      return res.status(502).json({
-        error: "The AI returned an invalid study kit format.",
+    if (result.error) {
+      writeEvent(res, {
+        type: "error",
+        status: result.status,
+        message: result.error,
       });
+    } else {
+      writeEvent(res, { type: "result", data: result.data });
     }
-
-    return res.json({
-      success: true,
-      data: validationResult.data,
-    });
   } catch (error) {
-    console.error("Generation error:", error);
+    const failure = describeAiError(error, "Failed to generate study kit.");
 
-    if (
-      error?.status === 429 ||
-      error?.code === 429 ||
-      error?.message?.includes("429") ||
-      error?.message?.toLowerCase().includes("quota")
-    ) {
-      return res.status(429).json({
-        error:
-          "AI generation quota has been reached. Please try again later.",
+    if (!res.writableEnded) {
+      writeEvent(res, {
+        type: "error",
+        status: failure.status,
+        message: failure.message,
       });
     }
+  }
 
-    if (
-      error?.message?.includes("API key") ||
-      error?.message?.includes("authentication") ||
-      error?.message?.includes("credentials")
-    ) {
-      return res.status(401).json({
-        error: "AI authentication failed. Check your LLM_API_KEY.",
-      });
-    }
+  res.end();
+});
 
-    return res.status(500).json({
-      error: "Failed to generate study kit.",
+app.post("/api/refine", async (req, res) => {
+  const parsedRequest = parseRefinementRequest(req.body);
+
+  if (parsedRequest.error) {
+    return res.status(parsedRequest.status).json({
+      error: parsedRequest.error,
     });
   }
+
+  const result = await requestStudyKit(
+    ai,
+    buildRefinementPrompt(parsedRequest.studyKit, parsedRequest.instruction),
+    "Failed to refine the study kit."
+  );
+
+  if (result.error) {
+    return res.status(result.status).json({
+      error: result.error,
+    });
+  }
+
+  return res.json({
+    success: true,
+    data: result.data,
+  });
 });
 
 app.listen(PORT, () => {

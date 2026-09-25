@@ -3,38 +3,72 @@ import Flashcard from "./Flashcard";
 
 function FlashcardDeck({ cards }) {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [flipped, setFlipped] = useState(false);
 
   if (!cards || cards.length === 0) {
     return null;
   }
 
   const currentCard = cards[currentIndex];
+  const total = cards.length;
 
-  const goPrevious = () => {
-    setCurrentIndex((index) => Math.max(index - 1, 0));
+  const goTo = (index) => {
+    const nextIndex = Math.min(Math.max(index, 0), total - 1);
+
+    if (nextIndex === currentIndex) {
+      return;
+    }
+
+    setCurrentIndex(nextIndex);
+    setFlipped(false);
   };
 
-  const goNext = () => {
-    setCurrentIndex((index) =>
-      Math.min(index + 1, cards.length - 1)
-    );
+  const toggleFlip = () => {
+    setFlipped((current) => !current);
   };
 
-  const progress = ((currentIndex + 1) / cards.length) * 100;
+  const handleKeyDown = (event) => {
+    if (event.altKey || event.ctrlKey || event.metaKey) {
+      return;
+    }
+
+    if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      goTo(currentIndex - 1);
+      return;
+    }
+
+    if (event.key === "ArrowRight") {
+      event.preventDefault();
+      goTo(currentIndex + 1);
+      return;
+    }
+
+    if (event.key === " " || event.key === "Spacebar") {
+      event.preventDefault();
+      toggleFlip();
+    }
+  };
+
+  const progress = ((currentIndex + 1) / total) * 100;
 
   return (
-    <section className="flashcard-section">
+    <section
+      className="flashcard-section"
+      role="group"
+      tabIndex={0}
+      aria-label={`Flashcard deck, card ${currentIndex + 1} of ${total}`}
+      onKeyDown={handleKeyDown}
+    >
       <div className="flashcard-section-header">
         <div>
-          <span className="flashcard-section-label">
-            FLASHCARDS
-          </span>
+          <span className="flashcard-section-label">FLASHCARDS</span>
 
           <h2>Review what you learned</h2>
         </div>
 
         <span className="flashcard-progress">
-          {currentIndex + 1} / {cards.length}
+          {currentIndex + 1} / {total}
         </span>
       </div>
 
@@ -45,29 +79,35 @@ function FlashcardDeck({ cards }) {
         />
       </div>
 
-      <Flashcard card={currentCard} />
+      <Flashcard card={currentCard} flipped={flipped} onToggle={toggleFlip} />
 
       <div className="flashcard-controls">
         <button
+          type="button"
           className="flashcard-button"
-          onClick={goPrevious}
+          onClick={() => goTo(currentIndex - 1)}
           disabled={currentIndex === 0}
         >
           ← Previous
         </button>
 
         <span className="flashcard-counter">
-          Card {currentIndex + 1} of {cards.length}
+          Card {currentIndex + 1} of {total}
         </span>
 
         <button
+          type="button"
           className="flashcard-button primary"
-          onClick={goNext}
-          disabled={currentIndex === cards.length - 1}
+          onClick={() => goTo(currentIndex + 1)}
+          disabled={currentIndex === total - 1}
         >
           Next →
         </button>
       </div>
+
+      <p className="flashcard-keyboard-hint">
+        Use ← and → to move between cards and Space to flip the current card.
+      </p>
     </section>
   );
 }

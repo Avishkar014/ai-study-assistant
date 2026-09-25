@@ -1,52 +1,50 @@
-import { useState } from "react";
-
-function Flashcard({ card }) {
-  const [showAnswer, setShowAnswer] = useState(false);
-
-  const handleClick = () => {
-    setShowAnswer((current) => !current);
-  };
-
+function Flashcard({ card, flipped, onToggle }) {
   return (
-    <div className="flashcard" onClick={handleClick}>
-      <div className="flashcard-top">
+    <button
+      type="button"
+      className={flipped ? "flashcard show-answer" : "flashcard"}
+      onClick={onToggle}
+      aria-pressed={flipped}
+      aria-label={
+        flipped
+          ? "Answer revealed. Activate to show the question."
+          : "Activate to reveal the answer."
+      }
+    >
+      <span className="flashcard-top">
         <span className="flashcard-type">
-          {showAnswer ? "ANSWER" : "QUESTION"}
+          {flipped ? "ANSWER" : "QUESTION"}
         </span>
 
-        <span className="flashcard-difficulty">
+        <span className={`flashcard-difficulty ${card.difficulty}`}>
           {card.difficulty}
         </span>
-      </div>
+      </span>
 
-      <div className="flashcard-body">
-        {!showAnswer ? (
+      <span className="flashcard-body" key={flipped ? "answer" : "question"}>
+        {flipped ? (
           <>
-            <p className="flashcard-label">Question</p>
+            <span className="flashcard-label">Answer</span>
 
-            <h3 className="flashcard-question">
-              {card.question}
-            </h3>
+            <span className="flashcard-answer">{card.answer}</span>
 
-            <p className="flashcard-hint">
-              Click to reveal the answer
-            </p>
+            <span className="flashcard-hint">
+              Press Space or click to see the question
+            </span>
           </>
         ) : (
           <>
-            <p className="flashcard-label">Answer</p>
+            <span className="flashcard-label">Question</span>
 
-            <p className="flashcard-answer">
-              {card.answer}
-            </p>
+            <span className="flashcard-question">{card.question}</span>
 
-            <p className="flashcard-hint">
-              Click to see the question
-            </p>
+            <span className="flashcard-hint">
+              Press Space or click to reveal the answer
+            </span>
           </>
         )}
-      </div>
-    </div>
+      </span>
+    </button>
   );
 }
 

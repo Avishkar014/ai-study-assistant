@@ -1,7 +1,13 @@
 import { useState } from "react";
 
-function PromptInput({ onGenerate, loading }) {
-  const [input, setInput] = useState("");
+function PromptInput({
+  onGenerate,
+  loading,
+  initialValue = "",
+  streaming,
+  onToggleStreaming,
+}) {
+  const [input, setInput] = useState(initialValue);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -17,9 +23,7 @@ function PromptInput({ onGenerate, loading }) {
 
   return (
     <form className="prompt-card" onSubmit={handleSubmit}>
-      <label htmlFor="study-input">
-        What do you want to study?
-      </label>
+      <label htmlFor="study-input">What do you want to study?</label>
 
       <textarea
         id="study-input"
@@ -32,12 +36,20 @@ function PromptInput({ onGenerate, loading }) {
       />
 
       <div className="prompt-footer">
-        <span>{input.length}/5000</span>
+        <label className="stream-toggle">
+          <input
+            type="checkbox"
+            checked={streaming}
+            onChange={onToggleStreaming}
+            disabled={loading}
+          />
 
-        <button
-          type="submit"
-          disabled={!input.trim() || loading}
-        >
+          <span>Live progress</span>
+        </label>
+
+        <span className="prompt-counter">{input.length}/5000</span>
+
+        <button type="submit" disabled={!input.trim() || loading}>
           {loading ? "Generating..." : "Generate Study Kit"}
         </button>
       </div>

@@ -1,3 +1,86 @@
+:root {
+  color-scheme: light;
+  --bg: #f7f8fc;
+  --surface: #ffffff;
+  --surface-soft: #f8fafc;
+  --surface-muted: #f1f5f9;
+  --header-bg: rgba(255, 255, 255, 0.9);
+  --border: #e2e8f0;
+  --border-soft: #e5e7eb;
+  --border-strong: #cbd5e1;
+  --heading: #0f172a;
+  --text: #171923;
+  --text-strong: #334155;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+  --text-soft: #6b7280;
+  --text-faint: #94a3b8;
+  --accent: #4f46e5;
+  --accent-hover: #4338ca;
+  --accent-light: #6366f1;
+  --accent-border: #c7d2fe;
+  --accent-soft: #eef2ff;
+  --accent-tint: #f8f7ff;
+  --on-accent: #ffffff;
+  --solid-bg: #111827;
+  --solid-text: #ffffff;
+  --success-bg: #dcfce7;
+  --success-text: #166534;
+  --success-border: #16a34a;
+  --warning-bg: #fef3c7;
+  --warning-text: #92400e;
+  --danger-bg: #fee2e2;
+  --danger-text: #991b1b;
+  --danger-border: #dc2626;
+  --shadow-card: 0 10px 30px rgba(17, 24, 39, 0.05);
+  --shadow-block: 0 12px 35px rgba(15, 23, 42, 0.06);
+  --shadow-hover: 0 18px 45px rgba(15, 23, 42, 0.1);
+  --focus-ring: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  --focus-outline: #6366f1;
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0b1020;
+  --surface: #141b2d;
+  --surface-soft: #1a2338;
+  --surface-muted: #1e2740;
+  --header-bg: rgba(13, 18, 32, 0.9);
+  --border: #27314b;
+  --border-soft: #212b42;
+  --border-strong: #384664;
+  --heading: #f1f5f9;
+  --text: #e2e8f0;
+  --text-strong: #cbd5e1;
+  --text-secondary: #b6c2d6;
+  --text-muted: #94a3b8;
+  --text-soft: #8c99ad;
+  --text-faint: #64748b;
+  --accent: #6366f1;
+  --accent-hover: #818cf8;
+  --accent-light: #818cf8;
+  --accent-border: #3d4779;
+  --accent-soft: #1c2447;
+  --accent-tint: #18203a;
+  --on-accent: #ffffff;
+  --solid-bg: #e2e8f0;
+  --solid-text: #0b1020;
+  --success-bg: #123024;
+  --success-text: #86efac;
+  --success-border: #22c55e;
+  --warning-bg: #3b2a0c;
+  --warning-text: #fcd34d;
+  --danger-bg: #3a1518;
+  --danger-text: #fca5a5;
+  --danger-border: #ef4444;
+  --shadow-card: 0 12px 32px rgba(0, 0, 0, 0.45);
+  --shadow-block: 0 14px 38px rgba(0, 0, 0, 0.5);
+  --shadow-hover: 0 20px 50px rgba(0, 0, 0, 0.55);
+  --focus-ring: 0 0 0 3px rgba(129, 140, 248, 0.25);
+  --focus-outline: #818cf8;
+}
+
+
 * {
   box-sizing: border-box;
 }
@@ -15,8 +98,20 @@ html {
 
 body {
   margin: 0;
-  background: #f7f8fc;
-  color: #171923;
+  background: var(--bg);
+  color: var(--text);
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+  outline: 3px solid var(--focus-outline);
+  outline-offset: 2px;
 }
 
 button,
@@ -29,8 +124,8 @@ button {
 }
 
 .header {
-  border-bottom: 1px solid #e5e7eb;
-  background: rgba(255, 255, 255, 0.9);
+  border-bottom: 1px solid var(--border-soft);
+  background: var(--header-bg);
 }
 
 .header-inner {
@@ -57,8 +152,8 @@ button {
   display: grid;
   place-items: center;
 
-  background: #111827;
-  color: white;
+  background: var(--solid-bg);
+  color: var(--solid-text);
   font-weight: 700;
 }
 
@@ -68,7 +163,7 @@ button {
 }
 
 .brand span {
-  color: #6b7280;
+  color: var(--text-soft);
   font-size: 12px;
 }
 
@@ -76,8 +171,8 @@ button {
   padding: 7px 12px;
   border-radius: 999px;
 
-  background: #eef2ff;
-  color: #4f46e5;
+  background: var(--accent-soft);
+  color: var(--accent);
 
   font-size: 12px;
   font-weight: 600;
@@ -97,7 +192,7 @@ button {
 .eyebrow {
   margin: 0 0 12px;
 
-  color: #4f46e5;
+  color: var(--accent);
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.12em;
@@ -114,7 +209,7 @@ button {
 .hero-description {
   margin-top: 20px;
 
-  color: #6b7280;
+  color: var(--text-soft);
   font-size: 17px;
   line-height: 1.7;
 }
@@ -122,11 +217,11 @@ button {
 .prompt-card {
   padding: 24px;
 
-  background: white;
-  border: 1px solid #e5e7eb;
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
   border-radius: 20px;
 
-  box-shadow: 0 10px 30px rgba(17, 24, 39, 0.05);
+  box-shadow: var(--shadow-card);
 }
 
 .prompt-card label {
@@ -141,7 +236,7 @@ button {
   width: 100%;
   resize: vertical;
 
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border-strong);
   border-radius: 14px;
 
   padding: 16px;
@@ -151,8 +246,8 @@ button {
 }
 
 .prompt-card textarea:focus {
-  border-color: #6366f1;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  border-color: var(--accent-light);
+  box-shadow: var(--focus-ring);
 }
 
 .prompt-footer {
@@ -164,7 +259,7 @@ button {
 }
 
 .prompt-footer span {
-  color: #9ca3af;
+  color: var(--text-faint);
   font-size: 12px;
 }
 
@@ -175,8 +270,8 @@ button {
 
   padding: 11px 18px;
 
-  background: #111827;
-  color: white;
+  background: var(--solid-bg);
+  color: var(--solid-text);
 
   font-weight: 600;
 }
@@ -193,9 +288,9 @@ button {
 
   text-align: center;
 
-  border: 1px dashed #d1d5db;
+  border: 1px dashed var(--border-strong);
   border-radius: 20px;
-  background: white;
+  background: var(--surface);
 }
 
 .empty-icon {
@@ -209,8 +304,8 @@ button {
 
   border-radius: 14px;
 
-  background: #eef2ff;
-  color: #4f46e5;
+  background: var(--accent-soft);
+  color: var(--accent);
 
   font-size: 22px;
 }
@@ -225,7 +320,7 @@ button {
   max-width: 500px;
   margin: 10px auto 0;
 
-  color: #6b7280;
+  color: var(--text-soft);
   line-height: 1.6;
 }
 
@@ -235,8 +330,8 @@ button {
 
   margin: 0 auto 16px;
 
-  border: 3px solid #e5e7eb;
-  border-top-color: #111827;
+  border: 3px solid var(--border-soft);
+  border-top-color: var(--solid-bg);
   border-radius: 50%;
 
   animation: spin 0.8s linear infinite;
@@ -253,8 +348,8 @@ button {
 
   border-radius: 50%;
 
-  background: #fee2e2;
-  color: #dc2626;
+  background: var(--danger-bg);
+  color: var(--danger-border);
 
   font-weight: 700;
 }
@@ -311,19 +406,19 @@ button {
   margin: 6px 0 0;
   font-size: 32px;
   line-height: 1.2;
-  color: #0f172a;
+  color: var(--heading);
 }
 
 .flashcard-section-label {
   font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.12em;
-  color: #4f46e5;
+  color: var(--accent);
 }
 
 .flashcard-progress {
   font-size: 14px;
-  color: #64748b;
+  color: var(--text-muted);
 }
 
 .flashcard-progress-bar {
@@ -332,13 +427,13 @@ button {
   margin-bottom: 28px;
   overflow: hidden;
   border-radius: 999px;
-  background: #e2e8f0;
+  background: var(--border);
 }
 
 .flashcard-progress-fill {
   height: 100%;
   border-radius: inherit;
-  background: #4f46e5;
+  background: var(--accent);
   transition: width 0.3s ease;
 }
 
@@ -347,10 +442,10 @@ button {
   min-height: 390px;
   padding: 40px;
   box-sizing: border-box;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border);
   border-radius: 24px;
-  background: #ffffff;
-  box-shadow: 0 15px 40px rgba(15, 23, 42, 0.07);
+  background: var(--surface);
+  box-shadow: var(--shadow-block);
   cursor: pointer;
   text-align: left;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -358,7 +453,7 @@ button {
 
 .flashcard:hover {
   transform: translateY(-3px);
-  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.1);
+  box-shadow: var(--shadow-hover);
 }
 
 .flashcard-top {
@@ -373,14 +468,14 @@ button {
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.12em;
-  color: #4f46e5;
+  color: var(--accent);
 }
 
 .flashcard-difficulty {
   padding: 6px 12px;
   border-radius: 999px;
-  background: #f1f5f9;
-  color: #475569;
+  background: var(--surface-muted);
+  color: var(--text-secondary);
   font-size: 12px;
   font-weight: 600;
   text-transform: capitalize;
@@ -392,22 +487,22 @@ button {
   font-size: 28px;
   line-height: 1.4;
   font-weight: 700;
-  color: #0f172a;
+  color: var(--heading);
 }
 
 .flashcard-hint {
   margin-top: 42px;
   font-size: 15px;
-  color: #64748b;
+  color: var(--text-muted);
 }
 
 .flashcard-answer {
   margin-top: 28px;
   padding: 20px;
   border-radius: 16px;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  color: #334155;
+  background: var(--surface-soft);
+  border: 1px solid var(--border);
+  color: var(--text-strong);
   font-size: 17px;
   line-height: 1.7;
 }
@@ -421,7 +516,7 @@ button {
 
 .flashcard-counter {
   font-size: 15px;
-  color: #475569;
+  color: var(--text-secondary);
 }
 
 .flashcard-buttons {
@@ -431,10 +526,10 @@ button {
 
 .flashcard-button {
   padding: 11px 18px;
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--border-strong);
   border-radius: 10px;
-  background: #ffffff;
-  color: #334155;
+  background: var(--surface);
+  color: var(--text-strong);
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
@@ -442,9 +537,9 @@ button {
 }
 
 .flashcard-button:hover:not(:disabled) {
-  border-color: #4f46e5;
-  color: #4f46e5;
-  background: #f8f7ff;
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-tint);
 }
 
 .flashcard-button:disabled {
@@ -453,14 +548,14 @@ button {
 }
 
 .flashcard-button.primary {
-  border-color: #4f46e5;
-  background: #4f46e5;
-  color: #ffffff;
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--on-accent);
 }
 
 .flashcard-button.primary:hover:not(:disabled) {
-  background: #4338ca;
-  color: #ffffff;
+  background: var(--accent-hover);
+  color: var(--on-accent);
 }
 
 @media (max-width: 700px) {
