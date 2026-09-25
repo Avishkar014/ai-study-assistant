@@ -1,0 +1,298 @@
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-family:
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+}
+
+body {
+  margin: 0;
+  background: #f7f8fc;
+  color: #171923;
+}
+
+button,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.header {
+  border-bottom: 1px solid #e5e7eb;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.header-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 18px 24px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+
+  display: grid;
+  place-items: center;
+
+  background: #111827;
+  color: white;
+  font-weight: 700;
+}
+
+.brand h2 {
+  margin: 0;
+  font-size: 17px;
+}
+
+.brand span {
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.header-badge {
+  padding: 7px 12px;
+  border-radius: 999px;
+
+  background: #eef2ff;
+  color: #4f46e5;
+
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.main-content {
+  width: min(900px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 70px 0;
+}
+
+.hero-section {
+  max-width: 700px;
+  margin-bottom: 32px;
+}
+
+.eyebrow {
+  margin: 0 0 12px;
+
+  color: #4f46e5;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
+.hero-section h1 {
+  margin: 0;
+
+  font-size: clamp(36px, 6vw, 58px);
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+}
+
+.hero-description {
+  margin-top: 20px;
+
+  color: #6b7280;
+  font-size: 17px;
+  line-height: 1.7;
+}
+
+.prompt-card {
+  padding: 24px;
+
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 20px;
+
+  box-shadow: 0 10px 30px rgba(17, 24, 39, 0.05);
+}
+
+.prompt-card label {
+  display: block;
+  margin-bottom: 12px;
+
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.prompt-card textarea {
+  width: 100%;
+  resize: vertical;
+
+  border: 1px solid #d1d5db;
+  border-radius: 14px;
+
+  padding: 16px;
+
+  outline: none;
+  line-height: 1.6;
+}
+
+.prompt-card textarea:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.prompt-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-top: 14px;
+}
+
+.prompt-footer span {
+  color: #9ca3af;
+  font-size: 12px;
+}
+
+.prompt-footer button,
+.state-card button {
+  border: 0;
+  border-radius: 10px;
+
+  padding: 11px 18px;
+
+  background: #111827;
+  color: white;
+
+  font-weight: 600;
+}
+
+.prompt-footer button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.empty-state,
+.state-card {
+  margin-top: 24px;
+  padding: 50px 24px;
+
+  text-align: center;
+
+  border: 1px dashed #d1d5db;
+  border-radius: 20px;
+  background: white;
+}
+
+.empty-icon {
+  width: 50px;
+  height: 50px;
+
+  margin: 0 auto 16px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 14px;
+
+  background: #eef2ff;
+  color: #4f46e5;
+
+  font-size: 22px;
+}
+
+.empty-state h3,
+.state-card h3 {
+  margin: 0;
+}
+
+.empty-state p,
+.state-card p {
+  max-width: 500px;
+  margin: 10px auto 0;
+
+  color: #6b7280;
+  line-height: 1.6;
+}
+
+.spinner {
+  width: 28px;
+  height: 28px;
+
+  margin: 0 auto 16px;
+
+  border: 3px solid #e5e7eb;
+  border-top-color: #111827;
+  border-radius: 50%;
+
+  animation: spin 0.8s linear infinite;
+}
+
+.error-icon {
+  width: 42px;
+  height: 42px;
+
+  margin: 0 auto 16px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 50%;
+
+  background: #fee2e2;
+  color: #dc2626;
+
+  font-weight: 700;
+}
+
+.error-state button {
+  margin-top: 20px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 600px) {
+  .header-inner {
+    padding: 14px 16px;
+  }
+
+  .header-badge {
+    display: none;
+  }
+
+  .main-content {
+    width: min(100% - 24px, 900px);
+    padding: 42px 0;
+  }
+
+  .prompt-card {
+    padding: 18px;
+  }
+
+  .prompt-footer {
+    align-items: flex-end;
+    gap: 12px;
+  }
+
+  .prompt-footer button {
+    padding: 10px 14px;
+  }
+}
