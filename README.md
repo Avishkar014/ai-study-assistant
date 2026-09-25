@@ -68,7 +68,7 @@ Validated Study Kit
     |
     v
 React UI
-
+```
 AI-generated content is never rendered directly.
 
 The backend first parses the response and validates its structure using Zod. Only validated data is returned to the frontend.
