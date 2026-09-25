@@ -1,16 +1,18 @@
 import { useState } from "react";
 
-function PromptInput() {
+function PromptInput({ onGenerate, loading }) {
   const [input, setInput] = useState("");
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
-    if (!input.trim()) {
+    const value = input.trim();
+
+    if (!value || loading) {
       return;
     }
 
-    console.log("Study request:", input);
+    await onGenerate(value);
   };
 
   return (
@@ -25,6 +27,8 @@ function PromptInput() {
         onChange={(event) => setInput(event.target.value)}
         placeholder="Example: React hooks, closures in JavaScript, DBMS normalization..."
         rows={6}
+        maxLength={5000}
+        disabled={loading}
       />
 
       <div className="prompt-footer">
@@ -32,9 +36,9 @@ function PromptInput() {
 
         <button
           type="submit"
-          disabled={!input.trim()}
+          disabled={!input.trim() || loading}
         >
-          Generate Study Kit
+          {loading ? "Generating..." : "Generate Study Kit"}
         </button>
       </div>
     </form>
